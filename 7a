@@ -1,0 +1,154 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Registration Form Validation',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const RegistrationFormScreen(),
+    );
+  }
+}
+
+// Step-2: StatefulWidget to manage local form state and input values
+class RegistrationFormScreen extends StatefulWidget {
+  const RegistrationFormScreen({super.key});
+
+  @override
+  State<RegistrationFormScreen> createState() => _RegistrationFormScreenState();
+}
+
+class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
+  // Step-3: GlobalKey to identify and validate the Form
+  final _formKey = GlobalKey<FormState>();
+
+  // Step-4: TextEditingController instances for each field
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+
+  // State variable for dropdown selection
+  String? _selectedGender;
+
+  @override
+  void dispose() {
+    // Clean up controllers when the widget is removed from the tree
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _phoneController.dispose();
+    _ageController.dispose();
+    _dobController.dispose();
+    super.dispose();
+  }
+
+  // Step-6: Custom Validator Logic Functions
+  String? _validateName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter your name';
+    }
+    if (value.trim().length < 3) {
+      return 'Name must be at least 3 characters';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegExp.hasMatch(value.trim())) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Confirm your password';
+    }
+    if (value != _passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+    final phoneRegExp = RegExp(r'^[0-9]+$');
+    if (!phoneRegExp.hasMatch(value.trim())) {
+      return 'Phone number must contain numeric digits only';
+    }
+    if (value.trim().length < 10) {
+      return 'Phone number must contain at least 10 digits';
+    }
+    return null;
+  }
+
+  String? _validateAge(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Age is required';
+    }
+    final age = int.tryParse(value.trim());
+    if (age == null || age < 1 || age > 120) {
+      return 'Age must be a valid number between 1 and 120';
+    }
+    return null;
+  }
+
+  String? _validateGender(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please select your gender';
+    }
+    return null;
+  }
+
+  String? _validateDob(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Date of Birth is required';
+    }
+    return null;
+  }
+
+  // Step-8: Date Picker Logic restricting future dates
+  Future<void> _selectDateOfBirth(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: now, // Restrict future dates
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text =
+            "${picked.year}-${picked.month.toString().
